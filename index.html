@@ -1,0 +1,981 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="ko"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;시간표형 타임 트래커&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Google Fonts - Inter 폰트 추가 (깔끔하면서도 귀여운 느낌) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* CSS 변수 정의 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--sky-blue-light: #e0f2f7; /* 연한 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--sky-blue-lighter: #f0faff; /* 아주 연한 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--cell-width: 60px; /* 셀 가로 크기 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--cell-height: 40px; /* 셀 세로 크기 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--table-width: calc(var(--cell-width) * 13); /* 시간 셀 1개 + 분 셀 12개 */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>/* 기존 핑크색 변수들을 하늘색으로 재정의 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--header-bg-color: var(--sky-blue-light);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--cell-bg-color: var(--sky-blue-lighter);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--cell-border-color: rgba(173, 216, 230, 0.7); /* 셀 테두리 연한 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--input-border-color: #ddd; /* 입력 필드 테두리 색상 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--main-shadow-color: rgba(0, 0, 0, 0.08); /* 주요 그림자 색상 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--button-main: #66b3ff; /* 버튼 메인 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--button-hover: #4da6ff; /* 버튼 호버 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--button-confirm: #3399ff; /* 확인 버튼 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--button-confirm-hover: #007bff; /* 확인 버튼 호버 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--button-cancel: #cccccc; /* 취소 버튼 회색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--button-cancel-hover: #b3b3b3; /* 취소 버튼 호버 회색 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 기본 바디 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #ffffff; /* 배경색을 흰색으로 변경 */</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overflow-x: hidden; /* 가로 스크롤 방지 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 컨테이너 스타일 (전체 앱을 감싸는 역할) */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: var(--table-width); /* 테이블 너비와 동일하게 설정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #ffffff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px; /* 둥근 모서리 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid rgba(160, 160, 160, 0.5); /* 연하고 조화로운 테두리 색상 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.08); /* 그림자 불투명도 조정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box; /* 패딩 포함 너비 계산 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 입력 UI 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: var(--table-width); /* 표의 너비와 동일하게 설정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px; /* 라운드 박스 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid rgba(160, 160, 160, 0.5); /* 연하고 조화로운 테두리 색상 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.08); /* 그림자 불투명도 조정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 30px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: nowrap; /* 한 줄로 정렬 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: flex-start; /* 왼쪽 정렬 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: 10px; /* 요소들 사이 간격 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overflow-x: auto; /* 내용이 넘칠 경우 스크롤 허용 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding-bottom: 10px; /* 스크롤바 공간 확보 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui input[type="text"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui select {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px 12px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--input-border-color);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui input[type="text"] {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 150px; /* 활동명 입력 필드 너비 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>min-width: 100px; /* 최소 너비 설정 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui select {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 70px; /* 시간/분 선택 필드 너비 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>min-width: 60px; /* 최소 너비 설정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>appearance: none; /* 기본 드롭다운 화살표 제거 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>-webkit-appearance: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>-moz-appearance: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>/* 커스텀 드롭다운 화살표 추가 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22%2F%3E%3C%2Fsvg%3E');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-repeat: no-repeat;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-position: right 0.7em top 50%, 0 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-size: 0.65em auto, 100%;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui input[type="color"] {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>-webkit-appearance: none; /* 기본 색상 선택기 스타일 제거 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>-moz-appearance: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>appearance: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 32px; /* 더 작고 귀엽게 조정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 32px; /* 더 작고 귀엽게 조정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer; /* 손가락 모양 커서 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: none; /* 기본 배경 숨김 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui input[type="color"]::-webkit-color-swatch-wrapper {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui input[type="color"]::-webkit-color-swatch {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid #ddd; /* 테두리 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-main); /* 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px 16px; /* 패딩을 줄여서 크기 조절 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer; /* 손가락 모양 커서 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px; /* 폰트 크기 조절 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2); /* 그림자 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease; /* 호버/클릭 시 애니메이션 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-shrink: 0; /* 버튼이 줄어들지 않도록 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui button:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-hover); /* 호버 시 색상 변경 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px) translateX(1px); /* 그림자 효과에 맞춰 이동 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 변경 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-ui button:active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(0); /* 클릭 시 원래 위치로 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 0px rgba(0, 0, 0, 0.2); /* 클릭 시 그림자 사라짐 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 시간표 컨테이너 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.time-table-container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: relative; /* 일정 블록 absolute 배치를 위한 기준점 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: var(--table-width);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px; /* 둥근 모서리 (전체 테이블 윤곽) */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden; /* 내부 요소가 컨테이너 밖으로 나가지 않도록 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid rgba(160, 160, 160, 0.5); /* 연하고 조화로운 테두리 색상 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.08); /* 그림자 불투명도 조정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 시간표 그리드 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.time-table {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: var(--cell-width) repeat(12, var(--cell-width)); /* 첫 열은 시간, 나머지 12열은 분 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-collapse: separate; /* 셀 간격 유지를 위해 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-spacing: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 시간표 셀 공통 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.time-table-cell {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: var(--cell-width);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: var(--cell-height);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--cell-border-color); /* 하늘색 계열 테두리 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 0; /* 개별 셀은 둥글지 않게 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px; /* 폰트 크기 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 분 단위 헤더 셀 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.header-minute-cell {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--header-bg-color); /* 연한 하늘색 배경 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 시간 단위 헤더 셀 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.header-hour-cell {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--header-bg-color); /* 연한 하늘색 배경 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 일반 시간 셀 배경 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.time-cell {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--cell-bg-color); /* 아주 연한 하늘색 배경 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 헤더 텍스트 색상 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.header-minute-cell, .header-hour-cell {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #555;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 일정 블록 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.schedule-block {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: absolute; /* 시간표 셀 위에 겹치도록 absolute 배치 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #87ceeb; /* 기본 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center; /* 텍스트 중앙 정렬 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center; /* 텍스트 중앙 정렬 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden; /* 텍스트 넘칠 경우 숨김 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-overflow: ellipsis; /* 텍스트 넘칠 경우 ... 표시 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>white-space: nowrap; /* 텍스트 줄 바꿈 방지 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer; /* 마우스 커서 손가락 모양 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>z-index: 10; /* 시간표 그리드 위에 겹치도록 z-index 높게 설정 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid rgba(0, 0, 0, 0.3); /* 그림자 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2); /* 그림자 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.1s ease, box-shadow 0.1s ease; /* 호버 시 애니메이션 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.schedule-block:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px) translateX(1px); /* 호버 시 그림자 효과에 맞춰 이동 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 변경 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.schedule-block.deleting {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #ff6347 !important; /* 삭제 시 빨간색으로 변경 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0.7;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: none; /* 삭제 시 그림자 제거 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 드래그 중 표시되는 임시 블록 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.drag-preview-block {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: rgba(135, 206, 235, 0.5); /* 반투명 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 1px dashed #87ceeb; /* 점선 테두리 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>z-index: 5; /* 일정 블록보다 아래에 위치 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: none; /* 마우스 이벤트 무시 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 커스텀 모달 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-overlay {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: fixed;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>top: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>left: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: rgba(0, 0, 0, 0.5); /* 반투명 검은색 오버레이 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1000; /* 다른 요소들 위에 표시 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>visibility: hidden; /* 기본적으로 숨김 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: visibility 0s, opacity 0.3s ease;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-overlay.visible {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>visibility: visible;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>opacity: 1;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-content {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 30px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid rgba(160, 160, 160, 0.5);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 350px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 90%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-20px); /* 등장 애니메이션 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.3s ease;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-overlay.visible .custom-modal-content {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(0);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-content h3 {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #333;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.4em;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-content p {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #666;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 25px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1.5;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-buttons {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px; /* 버튼 사이 간격 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-buttons button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 25px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: background-color 0.2s ease, transform 0.1s ease;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-buttons button.confirm-btn {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-confirm); /* 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-buttons button.confirm-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-confirm-hover);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px) translateX(1px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-buttons button.cancel-btn {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-cancel); /* 취소 버튼 색상 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #333;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-modal-buttons button.cancel-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-cancel-hover);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px) translateX(1px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 커스텀 알림 메시지 박스 스타일 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-alert-box {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: fixed;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>top: 50%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>left: 50%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -50%);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 25px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid rgba(160, 160, 160, 0.5);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1001; /* 모달보다 위에 표시 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>visibility: hidden;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: visibility 0s, opacity 0.3s ease, transform 0.3s ease;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 300px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 90%;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-alert-box.visible {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>visibility: visible;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>opacity: 1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -50%); /* 중앙 유지 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-alert-box p {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #333;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.1em;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-alert-box button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-main); /* 하늘색 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-alert-box button:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--button-hover);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px) translateX(1px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-alert-box button:active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 0px rgba(0, 0, 0, 0.2);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 반응형 디자인 (작은 화면에서 입력 UI 조정) */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 800px) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.input-ui {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: column; /* 세로로 정렬 */</p>
+<p class="p1"><span class="Apple-converted-space">                </span>align-items: flex-start; /* 왼쪽 정렬 */</p>
+<p class="p1"><span class="Apple-converted-space">                </span>flex-wrap: wrap; /* 작은 화면에서는 다시 줄 바꿈 허용 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.input-ui input[type="text"],</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.input-ui select,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.input-ui input[type="color"],</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.input-ui button {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>width: 100%; /* 너비 100% */</p>
+<p class="p1"><span class="Apple-converted-space">                </span>margin-bottom: 10px; /* 요소별 하단 여백 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.input-ui button {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>margin-top: 10px; /* 버튼 상단 여백 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 입력 UI 섹션 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="input-ui"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="activityName" placeholder="활동명"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="startTimeHour"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="startTimeMinute"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span style="color: #666; font-weight: bold;"&gt;~&lt;/span&gt; &lt;!-- 시간 구분자 추가 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="endTimeHour"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="endTimeMinute"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="color" id="blockColor" value="#87ceeb"&gt; &lt;!-- 기본 색상을 하늘색으로 변경 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="addActivity"&gt;추가&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="dayOfWeekSelect"&gt;&lt;/select&gt; &lt;!-- 요일 선택 드롭다운 추가 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 시간표 컨테이너 섹션 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="time-table-container" id="timeTableContainer"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="time-table" id="timeTable"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- 분 단위 헤더 행 (JavaScript로 첫 번째 빈 셀 제외하고 생성) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell" style="background-color: white; border: none;"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;05&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;10&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;15&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;20&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;25&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;30&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;35&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;40&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;45&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;50&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;55&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="time-table-cell header-minute-cell"&gt;60&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- 시간 셀들은 JavaScript로 생성될 예정 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 커스텀 삭제 확인 모달 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="custom-modal-overlay" id="deleteConfirmModal"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="custom-modal-content"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 id="modalActivityName"&gt;&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;이 활동을 정말 삭제하시겠습니까?&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="custom-modal-buttons"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="confirm-btn" id="confirmDeleteBtn"&gt;삭제&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="cancel-btn" id="cancelDeleteBtn"&gt;취소&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 커스텀 알림 메시지 박스 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="custom-alert-box" id="customAlertBox"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p id="customAlertMessage"&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="customAlertCloseBtn"&gt;확인&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// DOM 요소 참조</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const timeTable = document.getElementById('timeTable');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const timeTableContainer = document.getElementById('timeTableContainer');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const activityNameInput = document.getElementById('activityName');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const startTimeHourSelect = document.getElementById('startTimeHour');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const startTimeMinuteSelect = document.getElementById('startTimeMinute');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const endTimeHourSelect = document.getElementById('endTimeHour');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const endTimeMinuteSelect = document.getElementById('endTimeMinute');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const blockColorInput = document.getElementById('blockColor');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const addActivityButton = document.getElementById('addActivity');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const dayOfWeekSelect = document.getElementById('dayOfWeekSelect'); // 요일 선택 드롭다운</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 모달 관련 DOM 요소 참조</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const deleteConfirmModal = document.getElementById('deleteConfirmModal');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const modalActivityName = document.getElementById('modalActivityName');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 알림 메시지 박스 관련 DOM 요소 참조</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const customAlertBox = document.getElementById('customAlertBox');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const customAlertMessage = document.getElementById('customAlertMessage');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const customAlertCloseBtn = document.getElementById('customAlertCloseBtn');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let blockToDelete = null; // 삭제할 블록 요소를 저장할 변수</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 드래그 관련 변수</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let isDragging = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let dragStartCellData = null; // { hour, minute, col, row }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let currentDragElement = null; // 드래그 중 표시되는 임시 블록 DOM 요소</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 상수 정의</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const CELL_WIDTH = 60; // 셀 가로 크기</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const CELL_HEIGHT = 40; // 셀 세로 크기</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const MINUTES_IN_HOUR = 60; // 1시간은 60분</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const MINUTES_PER_CELL = 5; // 각 셀은 5분 단위</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const CELLS_PER_HOUR = MINUTES_IN_HOUR / MINUTES_PER_CELL; // 1시간당 분 셀 개수 (12개)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const TOTAL_HOURS = 24; // 총 24시간</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const START_DISPLAY_HOUR = 6; // 시간표 시작 시간 (오전 6시)</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 요일 배열 (월요일부터 시작)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const daysOfWeek = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let selectedDayIndex = new Date().getDay(); // 0:일, 1:월, ..., 6:토</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (selectedDayIndex === 0) selectedDayIndex = 6; // 일요일은 6 (마지막 요일)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>else selectedDayIndex--; // 월요일은 0, 화요일은 1, ... 토요일은 5로 조정</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 모든 요일의 활동을 저장하는 객체 (인메모리)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 예: { '0': [{...}, {...}], '1': [{...}], ... }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let allActivities = {};<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>daysOfWeek.forEach((_, index) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>allActivities[index] = []; // 각 요일별 빈 배열 초기화</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 커스텀 알림 메시지 표시 함수</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showAlert(message) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>customAlertMessage.textContent = message;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>customAlertBox.classList.add('visible');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 알림 메시지 닫기 버튼 이벤트 리스너</p>
+<p class="p1"><span class="Apple-converted-space">        </span>customAlertCloseBtn.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>customAlertBox.classList.remove('visible');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 시간/분 선택 드롭다운 채우기 함수</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function populateTimeSelects() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 시간 (06시부터 다음날 05시 55분까지 -&gt; 06~29)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = START_DISPLAY_HOUR; i &lt; START_DISPLAY_HOUR + TOTAL_HOURS; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const displayHour = i.toString().padStart(2, '0'); // 06, 07, ..., 23, 24, 25, ..., 29</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const startOpt = document.createElement('option');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startOpt.value = i;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startOpt.textContent = displayHour;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startTimeHourSelect.appendChild(startOpt);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const endOpt = document.createElement('option');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endOpt.value = i;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endOpt.textContent = displayHour;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endTimeHourSelect.appendChild(endOpt);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 분 (00분부터 55분까지)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; MINUTES_IN_HOUR; i += MINUTES_PER_CELL) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const minute = i.toString().padStart(2, '0');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const startOpt = document.createElement('option');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startOpt.value = i;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startOpt.textContent = minute;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startTimeMinuteSelect.appendChild(startOpt);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const endOpt = document.createElement('option');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endOpt.value = i;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endOpt.textContent = minute;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endTimeMinuteSelect.appendChild(endOpt);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 요일 선택 드롭다운 채우기 함수</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function populateDayOfWeekSelect() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dayOfWeekSelect.innerHTML = ''; // 기존 옵션 초기화</p>
+<p class="p1"><span class="Apple-converted-space">            </span>daysOfWeek.forEach((day, index) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const option = document.createElement('option');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>option.value = index;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>option.textContent = day;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>dayOfWeekSelect.appendChild(option);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dayOfWeekSelect.value = selectedDayIndex; // 현재 요일로 설정</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 시간표 그리드 생성 함수</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function createTimeTable() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 오전 6시부터 다음날 오전 5시 55분까지 (총 24시간)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 즉, 시간은 6시부터 29시 (다음날 5시)까지</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let h = START_DISPLAY_HOUR; h &lt; START_DISPLAY_HOUR + TOTAL_HOURS; h++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const displayHour = h % 24; // 24시 이상은 00, 01 등으로 표시</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const hourCell = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>hourCell.classList.add('time-table-cell', 'header-hour-cell');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>hourCell.textContent = displayHour.toString().padStart(2, '0');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>timeTable.appendChild(hourCell);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (let m = 0; m &lt; MINUTES_IN_HOUR; m += MINUTES_PER_CELL) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const cell = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>cell.classList.add('time-table-cell', 'time-cell');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>cell.dataset.hour = h; // 실제 시간 값 저장 (6~29)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>cell.dataset.minute = m; // 실제 분 값 저장 (0, 5, ..., 55)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>timeTable.appendChild(cell);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 시간 (시, 분)을 총 분으로 변환하는 헬퍼 함수</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function timeToTotalMinutes(hour, minute) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (hour * MINUTES_IN_HOUR) + minute;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/**</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* 단일 활동 블록을 시간표에 렌더링하는 함수.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* 이 함수는 `renderActivitiesForSelectedDay`에서 호출됩니다.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderSingleActivityBlock(activityData, activityIndexInArray) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let currentStartMinutes = timeToTotalMinutes(activityData.startHour, activityData.startMinute);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let finalEndMinutes = timeToTotalMinutes(activityData.endHour, activityData.endMinute);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 활동을 1시간 단위 또는 남은 시간 단위로 분할하여 블록 생성</p>
+<p class="p1"><span class="Apple-converted-space">            </span>while (currentStartMinutes &lt; finalEndMinutes) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const segmentStartHour = Math.floor(currentStartMinutes / MINUTES_IN_HOUR);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const segmentStartMinute = currentStartMinutes % MINUTES_IN_HOUR;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 현재 시간대의 끝 (예: 09:55 + 5분 = 10:00) 또는 활동의 최종 종료 시간 중 더 이른 시간을 선택</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let segmentEndMinutes = Math.min(</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>finalEndMinutes,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>timeToTotalMinutes(segmentStartHour, 55) + MINUTES_PER_CELL</p>
+<p class="p1"><span class="Apple-converted-space">                </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const segmentDurationMinutes = segmentEndMinutes - currentStartMinutes;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (segmentDurationMinutes &lt;= 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentStartMinutes = segmentEndMinutes;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>continue;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const segmentStartCellIndexInHour = segmentStartMinute / MINUTES_PER_CELL;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const segmentDurationCells = segmentDurationMinutes / MINUTES_PER_CELL;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const row = (segmentStartHour - START_DISPLAY_HOUR); // 시간표 상의 행 인덱스 (0부터 시작)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const col = segmentStartCellIndexInHour + 1; // 열 인덱스 (+1은 첫 번째 열이 시간 레이블이기 때문)</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 시간표 표시 범위를 벗어나는 블록은 렌더링하지 않음</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (row &lt; 0 || row &gt;= TOTAL_HOURS) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentStartMinutes = segmentEndMinutes;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>continue;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const block = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.classList.add('schedule-block');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.textContent = activityData.activityName;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.style.backgroundColor = activityData.blockColor;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 일정 블록의 위치와 크기 계산</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.style.left = `${col * CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.style.top = `${(row + 1) * CELL_HEIGHT}px`; // +1은 분 헤더 행 때문에 한 칸 아래로 내려가야 함</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.style.width = `${segmentDurationCells * CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.style.height = `${CELL_HEIGHT}px`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 데이터 속성 저장 (삭제 시 확인 메시지 등에 사용)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.originalActivityName = activityData.activityName;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.originalStartHour = activityData.startHour;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.originalStartMinute = activityData.startMinute;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.originalEndHour = activityData.endHour;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.originalEndMinute = activityData.endMinute;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.blockColor = activityData.blockColor;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.dayOfWeek = activityData.dayOfWeek; // 요일 데이터 추가</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.dataset.activityIndex = activityIndexInArray; // 배열 내 인덱스 저장 (삭제 시 활용)</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 삭제 기능 추가: 커스텀 모달 사용</p>
+<p class="p1"><span class="Apple-converted-space">                </span>block.addEventListener('click', (event) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>event.stopPropagation(); // 부모 요소로의 클릭 이벤트 전파 방지</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>blockToDelete = block; // 삭제할 블록 저장</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>modalActivityName.textContent = `'${block.dataset.originalActivityName}' 활동을`; // 모달에 활동명 표시</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>deleteConfirmModal.classList.add('visible'); // 모달 표시</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>timeTableContainer.appendChild(block); // 시간표 컨테이너에 블록 추가</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>currentStartMinutes = segmentEndMinutes; // 다음 세그먼트의 시작 시간으로 이동</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/**</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* 현재 선택된 요일의 활동들을 시간표에 렌더링하는 함수.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* 요일 변경 시 또는 활동 추가/삭제 시 호출됩니다.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderActivitiesForSelectedDay() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 기존 시간표 블록 모두 제거</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.schedule-block').forEach(block =&gt; block.remove());</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const activitiesForCurrentDay = allActivities[selectedDayIndex] || [];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>activitiesForCurrentDay.forEach((activity, index) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderSingleActivityBlock(activity, index);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/**</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* 입력 UI의 값으로 새로운 활동을 추가하는 함수.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* 활동 데이터를 `allActivities` 객체에 저장하고 시간표를 다시 렌더링합니다.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function addActivityBlock() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const activityName = activityNameInput.value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const initialStartHour = parseInt(startTimeHourSelect.value, 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const initialStartMinute = parseInt(startTimeMinuteSelect.value, 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const initialEndHour = parseInt(endTimeHourSelect.value, 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const initialEndMinute = parseInt(endTimeMinuteSelect.value, 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const blockColor = blockColorInput.value;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const dayOfWeek = parseInt(dayOfWeekSelect.value, 10); // 선택된 요일 인덱스</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!activityName) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showAlert('활동명을 입력해주세요.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>let currentStartMinutes = timeToTotalMinutes(initialStartHour, initialStartMinute);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let finalEndMinutes = timeToTotalMinutes(initialEndHour, initialEndMinute);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (currentStartMinutes &gt;= finalEndMinutes) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showAlert('종료 시간은 시작 시간보다 늦어야 합니다.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const tableStartTimeTotalMinutes = timeToTotalMinutes(START_DISPLAY_HOUR, 0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const tableEndTimeTotalMinutes = timeToTotalMinutes(START_DISPLAY_HOUR + TOTAL_HOURS, 0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (currentStartMinutes &lt; tableStartTimeTotalMinutes || finalEndMinutes &gt; tableEndTimeTotalMinutes) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showAlert('시작 또는 종료 시간이 시간표 범위(오전 6시 ~ 다음날 오전 5시 55분)를 벗어납니다.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 새로운 활동 객체 생성</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const newActivity = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>activityName,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startHour: initialStartHour,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startMinute: initialStartMinute,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endHour: initialEndHour,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endMinute: initialEndMinute,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>blockColor,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>dayOfWeek // 요일 정보 추가</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 해당 요일 배열에 활동 추가</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!allActivities[dayOfWeek]) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>allActivities[dayOfWeek] = [];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>allActivities[dayOfWeek].push(newActivity);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 현재 선택된 요일의 시간표 다시 렌더링</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderActivitiesForSelectedDay();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 입력 필드 초기화</p>
+<p class="p1"><span class="Apple-converted-space">            </span>activityNameInput.value = '';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// blockColorInput.value = '#ff88bb'; // 기본 색상으로 재설정</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 모달 '삭제' 버튼 클릭 이벤트</p>
+<p class="p1"><span class="Apple-converted-space">        </span>confirmDeleteBtn.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (blockToDelete) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dayToDelete = parseInt(blockToDelete.dataset.dayOfWeek, 10);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const activityIndexToDelete = parseInt(blockToDelete.dataset.activityIndex, 10);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// `allActivities` 배열에서 해당 활동 제거</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (allActivities[dayToDelete] &amp;&amp; allActivities[dayToDelete][activityIndexToDelete]) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>allActivities[dayToDelete].splice(activityIndexToDelete, 1);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>blockToDelete.classList.add('deleting'); // 삭제 시 시각적 효과</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>blockToDelete.remove(); // 블록 삭제</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>blockToDelete = null; // 변수 초기화</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>deleteConfirmModal.classList.remove('visible'); // 모달 숨김</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderActivitiesForSelectedDay(); // 삭제 후 시간표 다시 렌더링 (인덱스 문제 방지)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 300); // 짧은 지연 후 삭제 (애니메이션 효과를 위해)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 모달 '취소' 버튼 클릭 이벤트</p>
+<p class="p1"><span class="Apple-converted-space">        </span>cancelDeleteBtn.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>blockToDelete = null; // 변수 초기화</p>
+<p class="p1"><span class="Apple-converted-space">            </span>deleteConfirmModal.classList.remove('visible'); // 모달 숨김</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 모달 오버레이 외부 클릭 시 모달 닫기 (선택 사항)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>deleteConfirmModal.addEventListener('click', (event) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (event.target === deleteConfirmModal) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>blockToDelete = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>deleteConfirmModal.classList.remove('visible');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- 드래그 기능 구현 시작 ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 마우스 좌표로부터 셀 데이터 (시간, 분, 열, 행)를 가져오는 함수</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function getCellDataFromCoordinates(clientX, clientY) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const containerRect = timeTableContainer.getBoundingClientRect();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const relativeX = clientX - containerRect.left;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const relativeY = clientY - containerRect.top;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 시간표 헤더를 제외한 실제 셀 영역 계산</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 첫 번째 열은 시간 헤더, 첫 번째 행은 분 헤더</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// colIndex는 0부터 시작 (0은 시간 레이블 열)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// rowIndex는 0부터 시작 (0은 분 헤더 행)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const colIndex = Math.floor(relativeX / CELL_WIDTH);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const rowIndex = Math.floor(relativeY / CELL_HEIGHT);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 시간표 그리드 범위 내에 있는지 확인 (헤더 제외)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (colIndex &lt; 1 || rowIndex &lt; 1) { // colIndex 0은 시간 레이블, rowIndex 0은 분 헤더</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return null; // 헤더 영역이거나 시간표 밖</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 실제 시간 및 분 계산 (시작 시간과 셀 크기 고려)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const hour = (rowIndex - 1) + START_DISPLAY_HOUR;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const minute = (colIndex - 1) * MINUTES_PER_CELL;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 계산된 시간/분이 유효한 시간표 범위 내에 있는지 다시 확인</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (hour &gt;= START_DISPLAY_HOUR &amp;&amp; hour &lt; START_DISPLAY_HOUR + TOTAL_HOURS &amp;&amp;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>minute &gt;= 0 &amp;&amp; minute &lt; MINUTES_IN_HOUR) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return { hour, minute, col: colIndex, row: rowIndex };</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 마우스 다운 이벤트 핸들러</p>
+<p class="p1"><span class="Apple-converted-space">        </span>timeTableContainer.addEventListener('mousedown', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 마우스 왼쪽 버튼만 허용</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (e.button !== 0) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 시간표 셀 위에서만 드래그 시작</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startCellData = getCellDataFromCoordinates(e.clientX, e.clientY);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!startCellData) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>isDragging = true;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dragStartCellData = startCellData;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 임시 드래그 미리보기 블록 생성</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentDragElement = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentDragElement.classList.add('drag-preview-block');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 초기 위치와 크기 설정 (시작 셀과 동일)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentDragElement.style.left = `${dragStartCellData.col * CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentDragElement.style.top = `${dragStartCellData.row * CELL_HEIGHT}px`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentDragElement.style.width = `${CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentDragElement.style.height = `${CELL_HEIGHT}px`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>timeTableContainer.appendChild(currentDragElement);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 문서 전체에 mousemove와 mouseup 이벤트 리스너 추가 (드래그 중 마우스가 테이블 밖으로 나가도 인식)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.addEventListener('mousemove', handleMouseMove);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.addEventListener('mouseup', handleMouseUp);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 마우스 이동 이벤트 핸들러</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function handleMouseMove(e) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isDragging) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const currentCellData = getCellDataFromCoordinates(e.clientX, e.clientY);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (currentCellData) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 드래그 시작 셀과 현재 셀의 시간 데이터를 비교하여 실제 시작/종료 시간 결정</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let effectiveStartTotalMinutes = timeToTotalMinutes(dragStartCellData.hour, dragStartCellData.minute);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let effectiveEndTotalMinutes = timeToTotalMinutes(currentCellData.hour, currentCellData.minute);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 드래그 방향에 따라 시작/종료 시간 조정</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (effectiveEndTotalMinutes &lt; effectiveStartTotalMinutes) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>[effectiveStartTotalMinutes, effectiveEndTotalMinutes] = [effectiveEndTotalMinutes, effectiveStartTotalMinutes];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 종료 시간은 선택된 셀의 끝을 의미하므로 5분 추가</p>
+<p class="p1"><span class="Apple-converted-space">                </span>effectiveEndTotalMinutes += MINUTES_PER_CELL;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const tableStartTimeTotalMinutes = timeToTotalMinutes(START_DISPLAY_HOUR, 0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const startCellIndex = (effectiveStartTotalMinutes - tableStartTimeTotalMinutes) / MINUTES_PER_CELL;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const endCellIndex = (effectiveEndTotalMinutes - tableStartTimeTotalMinutes) / MINUTES_PER_CELL;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const durationCells = endCellIndex - startCellIndex;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (durationCells &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const startHourForDisplay = Math.floor(effectiveStartTotalMinutes / MINUTES_IN_HOUR);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const startMinuteForDisplay = effectiveStartTotalMinutes % MINUTES_IN_HOUR;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const row = (startHourForDisplay - START_DISPLAY_HOUR);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const col = (startMinuteForDisplay / MINUTES_PER_CELL) + 1;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.left = `${col * CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.top = `${(row + 1) * CELL_HEIGHT}px`; // +1은 분 헤더 행 때문에 한 칸 아래로 내려가야 함</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.width = `${durationCells * CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.height = `${CELL_HEIGHT}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// 드래그 길이가 0이거나 음수일 경우 (한 칸 이하)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.width = `${CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.height = `${CELL_HEIGHT}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.left = `${dragStartCellData.col * CELL_WIDTH}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentDragElement.style.top = `${dragStartCellData.row * CELL_HEIGHT}px`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 마우스 업 이벤트 핸들러</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function handleMouseUp(e) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isDragging) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>isDragging = false;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 임시 드래그 미리보기 블록 제거</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (currentDragElement) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>currentDragElement.remove();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>currentDragElement = null;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const endCellData = getCellDataFromCoordinates(e.clientX, e.clientY);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (dragStartCellData &amp;&amp; endCellData) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let startTotalMinutes = timeToTotalMinutes(dragStartCellData.hour, dragStartCellData.minute);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let endTotalMinutes = timeToTotalMinutes(endCellData.hour, endCellData.minute);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 드래그 방향에 따라 실제 시작/종료 시간 확정</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (endTotalMinutes &lt; startTotalMinutes) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>[startTotalMinutes, endTotalMinutes] = [endTotalMinutes, startTotalMinutes];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 종료 시간은 선택된 셀의 끝을 의미하므로 5분 추가</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let finalAdjustedEndMinutes = endTotalMinutes + MINUTES_PER_CELL;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let finalAdjustedEndHour = Math.floor(finalAdjustedEndMinutes / MINUTES_IN_HOUR);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let finalAdjustedEndMinute = finalAdjustedEndMinutes % MINUTES_IN_HOUR;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 입력 UI에 드래그된 시간 범위 채우기</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startTimeHourSelect.value = Math.floor(startTotalMinutes / MINUTES_IN_HOUR);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startTimeMinuteSelect.value = startTotalMinutes % MINUTES_IN_HOUR;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endTimeHourSelect.value = finalAdjustedEndHour;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endTimeMinuteSelect.value = finalAdjustedEndMinute;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 활동명 입력 필드에 포커스</p>
+<p class="p1"><span class="Apple-converted-space">                </span>activityNameInput.focus();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 문서에 추가했던 이벤트 리스너 제거</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.removeEventListener('mousemove', handleMouseMove);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.removeEventListener('mouseup', handleMouseUp);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dragStartCellData = null; // 드래그 시작 데이터 초기화</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- 드래그 기능 구현 끝 ---</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 초기화 함수 호출</p>
+<p class="p1"><span class="Apple-converted-space">        </span>populateTimeSelects(); // 시간/분 드롭다운 채우기</p>
+<p class="p1"><span class="Apple-converted-space">        </span>populateDayOfWeekSelect(); // 요일 드롭다운 채우기</p>
+<p class="p1"><span class="Apple-converted-space">        </span>createTimeTable(); // 시간표 그리드 생성</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderActivitiesForSelectedDay(); // 초기 로드 시 현재 요일 활동 렌더링</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// '추가' 버튼 클릭 이벤트 리스너</p>
+<p class="p1"><span class="Apple-converted-space">        </span>addActivityButton.addEventListener('click', addActivityBlock);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 요일 선택 변경 시 이벤트 리스너</p>
+<p class="p1"><span class="Apple-converted-space">        </span>dayOfWeekSelect.addEventListener('change', (event) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>selectedDayIndex = parseInt(event.target.value, 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderActivitiesForSelectedDay(); // 요일 변경 시 활동 다시 렌더링</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 초기 선택값 설정 (예: 9시 00분 ~ 10시 00분)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>startTimeHourSelect.value = '9';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>startTimeMinuteSelect.value = '0';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>endTimeHourSelect.value = '10';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>endTimeMinuteSelect.value = '0';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
